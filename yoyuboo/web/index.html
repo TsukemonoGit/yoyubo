@@ -80,17 +80,85 @@
         });
       }
 
-      // File System Access API for saving main data
+      async function deleteHandle(key) {
+        const db = await openDB();
+        const transaction = db.transaction([storeName], "readwrite");
+        const store = transaction.objectStore(storeName);
+        store.delete(key);
+      }
+
+      // IndexedDBにファイルハンドルが保存済みか確認
+      async function hasStoredHandle() {
+        try {
+          const handle = await getHandle("mainFile");
+          return handle !== undefined && handle !== null;
+        } catch (e) {
+          return false;
+        }
+      }
+
+      // File System Access API: 既存ファイルを開く（読み書き可能）
+      async function openFile() {
+        try {
+          const handle = await window.showSaveFilePicker({
+            types: [{
+              description: "JSON File",
+              accept: { "application/json": [".json"] },
+            }],
+            suggestedName: "data.json",
+          });
+          await saveHandle("mainFile", handle);
+          return "success";
+        } catch (e) {
+          if (e.name === "AbortError") {
+            return "cancel";
+          }
+          return "error: " + e.message;
+        }
+      }
+
+      // File System Access API: 新規ファイル作成
+      async function createFile() {
+        try {
+          const handle = await window.showSaveFilePicker({
+            types: [{
+              description: "JSON File",
+              accept: { "application/json": [".json"] },
+            }],
+            suggestedName: "data.json",
+          });
+          await saveHandle("mainFile", handle);
+          return "success";
+        } catch (e) {
+          if (e.name === "AbortError") {
+            return "cancel";
+          }
+          return "error: " + e.message;
+        }
+      }
+
+      // File System Access API: ファイルに保存
       async function saveMainFile(content) {
         try {
-          const handle = await window.showDirectoryPicker();
-          const fileHandle = await handle.getFileHandle("data.json", {
-            create: true,
-          });
+          const fileHandle = await getHandle("mainFile");
+          if (!fileHandle) {
+            // ハンドルがない場合は新規保存ダイアログを表示
+            const handle = await window.showSaveFilePicker({
+              types: [{
+                description: "JSON File",
+                accept: { "application/json": [".json"] },
+              }],
+              suggestedName: "data.json",
+            });
+            await saveHandle("mainFile", handle);
+            const writable = await handle.createWritable();
+            await writable.write(content);
+            await writable.close();
+            return "success";
+          }
           const writable = await fileHandle.createWritable();
           await writable.write(content);
           await writable.close();
-          await saveHandle("mainFile", fileHandle);
           return "success";
         } catch (e) {
           return "error: " + e.message;
@@ -127,6 +195,9 @@
       window.saveMainFile = saveMainFile;
       window.loadMainFile = loadMainFile;
       window.getFileHandleName = getFileHandleName;
+      window.hasStoredHandle = hasStoredHandle;
+      window.openFile = openFile;
+      window.createFile = createFile;
     </script>
   </body>
 </html>

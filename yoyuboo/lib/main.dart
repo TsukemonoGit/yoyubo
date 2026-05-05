@@ -63,11 +63,12 @@ class RootScreen extends StatelessWidget {
       );
     }
 
-    if (!provider.isStorageSelected && !kIsWeb) {
-      return const StorageSelectionScreen(
+    if (!provider.isStorageSelected) {
+      return StorageSelectionScreen(
         title: '保存先を選択',
-        message:
-            'yoyuboo.json を保存するファイルを選びます。\n'
+        message: kIsWeb
+            ? 'yoyuboo.json を保存するファイルを選びます。'
+            : 'yoyuboo.json を保存するファイルを選びます。\n'
             'Google Drive や Dropbox も利用できます。',
       );
     }

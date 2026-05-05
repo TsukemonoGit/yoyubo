@@ -9,3 +9,7 @@ Future<String> callSaveMainFile(String content) =>
 Future<bool> callHasStoredHandle() => throw UnsupportedError('Web only');
 
 Future<String> callGetFileHandleName() => throw UnsupportedError('Web only');
+
+Future<String> callOpenFile() => throw UnsupportedError('Web only');
+
+Future<String> callCreateFile() => throw UnsupportedError('Web only');

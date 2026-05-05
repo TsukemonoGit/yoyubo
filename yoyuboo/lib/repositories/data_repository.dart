@@ -39,6 +39,10 @@ class DataRepository {
   // ファイルを選択させてURIを取得する
   // 戻り値: true=選択完了, false=キャンセル or 失敗
   Future<bool> openFile() async {
+    if (kIsWeb) {
+      final result = await callOpenFile();
+      return result == 'success';
+    }
     if (!_canUseNativeFileChannel) return false;
     try {
       final result = await _channel.invokeMethod<bool>('openFile');
@@ -51,6 +55,10 @@ class DataRepository {
   }
 
   Future<bool> createFile() async {
+    if (kIsWeb) {
+      final result = await callCreateFile();
+      return result == 'success';
+    }
     if (!_canUseNativeFileChannel) return false;
     try {
       final result = await _channel.invokeMethod<bool>('createFile');
