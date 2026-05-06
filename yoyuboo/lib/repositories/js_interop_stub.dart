@@ -12,6 +12,6 @@ Future<String> callGetFileHandleName() => throw UnsupportedError('Web only');
 
 Future<String> callOpenFile() => throw UnsupportedError('Web only');
 
-   Future<String> callCreateFile() => throw UnsupportedError('Web only');
+Future<String> callCreateFile() => throw UnsupportedError('Web only');
 
-    Future<String> callRestoreFile() => throw UnsupportedError('Web only');
+Future<String> callRestoreFile() => throw UnsupportedError('Web only');

@@ -76,7 +76,7 @@ class DataRepository {
       final result = await callRestoreFile();
       return result == 'success';
     }
-    // Android/Web以外は未対応
+    // Webのみ対応（Androidは未対応）
     return false;
   }
 
