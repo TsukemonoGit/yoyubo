@@ -35,6 +35,7 @@ class MainActivity : FlutterActivity() {
                             else result.error("INVALID_ARG", "content is null", null)
                         }
                         "readBackup" -> readBackup(result)
+                        "getFilePath" -> getFilePath(result)
                         else -> result.notImplemented()
                     }
                 }
@@ -136,6 +137,16 @@ class MainActivity : FlutterActivity() {
             android.util.Log.e("MainActivity", "writeFile: error=${e.message}", e)
             result.error("WRITE_ERROR", e.message, null)
         }
+    }
+
+    // --- ファイルパスを取得 ---
+    private fun getFilePath(result: MethodChannel.Result) {
+        val uri = loadUri()
+        if (uri == null) {
+            result.success(null)
+            return
+        }
+        result.success(uri.toString())
     }
 
     // --- バックアップ読み込み ---

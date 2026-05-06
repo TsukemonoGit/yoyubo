@@ -70,6 +70,16 @@ class DataRepository {
     }
   }
 
+  // 前回開いたファイルを開く
+  Future<bool> restoreFile() async {
+    if (kIsWeb) {
+      final result = await callRestoreFile();
+      return result == 'success';
+    }
+    // Android/Web以外は未対応
+    return false;
+  }
+
   // 前回のファイルURIが保存されているか確認する
   Future<bool> hasStoredFile() async {
     if (kIsWeb) {
@@ -209,6 +219,26 @@ class DataRepository {
     }
     // Web以外では未対応
     return null;
+  }
+
+  // ファイルパス（URI）を取得する
+  Future<String?> getFilePath() async {
+    if (kIsWeb) {
+      final result = await callGetFileHandleName();
+      if (result.startsWith('error:')) {
+        return null;
+      }
+      return result;
+    }
+    if (!_canUseNativeFileChannel) return null;
+    try {
+      final result = await _channel.invokeMethod<String>('getFilePath');
+      return result;
+    } on PlatformException {
+      return null;
+    } on MissingPluginException {
+      return null;
+    }
   }
 
   // 内部バックアップから読み込む（設定画面の「バックアップから復元」）

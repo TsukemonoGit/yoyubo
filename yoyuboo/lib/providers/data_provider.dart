@@ -86,9 +86,10 @@ class AppDataProvider extends ChangeNotifier {
       developer.log('initialize: load failed, error=$_errorMessage', name: 'DataProvider');
     }
 
-    // ファイル名を取得
+    // ファイル名とパスを取得
     _currentFileName = await repository.getFileName();
-    developer.log('initialize: fileName=$_currentFileName', name: 'DataProvider');
+    _currentFilePath = await repository.getFilePath();
+    developer.log('initialize: fileName=$_currentFileName, filePath=$_currentFilePath', name: 'DataProvider');
 
     _isInitialized = true;
     notifyListeners();
@@ -211,6 +212,7 @@ class AppDataProvider extends ChangeNotifier {
         _lastStatus = LoadResultStatus.success;
         _errorMessage = null;
         _currentFileName = await repository.getFileName();
+        _currentFilePath = await repository.getFilePath();
         notifyListeners();
         return true;
       } else {

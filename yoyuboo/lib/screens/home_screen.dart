@@ -32,7 +32,7 @@ class _HomePageState extends State<HomePage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             const Text('Yoyuboo'),
-            if (provider.currentFileName != null) ...[
+            if (provider.currentFilePath != null) ...[
               const SizedBox(width: 8),
               Icon(
                 Icons.description,
@@ -42,7 +42,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(width: 4),
               Flexible(
                 child: Text(
-                  provider.currentFileName!,
+                  provider.currentFilePath!,
                   style: Theme.of(context).textTheme.bodySmall,
                   overflow: TextOverflow.ellipsis,
                 ),

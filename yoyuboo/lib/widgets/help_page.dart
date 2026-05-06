@@ -15,7 +15,7 @@ class HelpPage extends StatelessWidget {
       appBar: AppBar(title: const Text('使い方')),
       body: Column(
         children: [
-          if (provider.currentFileName != null)
+          if (provider.currentFilePath != null)
             _HelpFileInfoBox(provider: provider),
           Expanded(
             child: ListView(
@@ -82,13 +82,16 @@ class _HelpFileInfoBox extends StatelessWidget {
                     color: Colors.grey[600],
                   ),
                 ),
-                Text(
-                  provider.currentFileName!,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 13,
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    provider.currentFilePath!,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 13,
+                    ),
+                    textAlign: TextAlign.right,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
