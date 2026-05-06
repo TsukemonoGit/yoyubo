@@ -67,7 +67,7 @@ class _HomeMenuList extends StatelessWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 46),
       children: [
-        if (provider.currentFilePath != null)
+        if (provider.currentFileName != null)
           ...[_buildFileInfoSection(context, provider),
               const Divider(height: 1)],
         _buildAddSection(context),
@@ -120,7 +120,7 @@ class _HomeMenuList extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        provider.currentFilePath!,
+                        provider.currentFileName!,
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
@@ -133,6 +133,24 @@ class _HomeMenuList extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (provider.currentFilePath != null) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Icon(Icons.folder,
+                          size: 14, color: Colors.grey[600]),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          provider.currentFilePath!,
+                          style: const TextStyle(
+                              fontSize: 11, color: Colors.grey),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
