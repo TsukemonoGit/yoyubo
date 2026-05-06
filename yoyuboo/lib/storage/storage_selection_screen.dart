@@ -33,7 +33,10 @@ class StorageSelectionScreen extends StatelessWidget {
               ),
               if (kIsWeb)
                 FutureBuilder<bool>(
-                  future: context.read<AppDataProvider>().repository.hasStoredFile(),
+                  future: context
+                      .read<AppDataProvider>()
+                      .repository
+                      .hasStoredFile(),
                   builder: (context, snapshot) {
                     if (snapshot.data != true) return const SizedBox.shrink();
                     return Column(
@@ -47,6 +50,7 @@ class StorageSelectionScreen extends StatelessWidget {
                     );
                   },
                 ),
+              if (!kIsWeb) const SizedBox(height: 8),
               if (kIsWeb) const SizedBox(height: 8),
               OutlinedButton(
                 onPressed: () => _pickFile(context, create: true),
@@ -59,10 +63,8 @@ class StorageSelectionScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _pickFile(
-      BuildContext context, {required bool create}) async {
-    await context.read<AppDataProvider>().pickFileAndInitialize(
-        create: create);
+  Future<void> _pickFile(BuildContext context, {required bool create}) async {
+    await context.read<AppDataProvider>().pickFileAndInitialize(create: create);
   }
 
   Future<void> _restoreFile(BuildContext context) async {
