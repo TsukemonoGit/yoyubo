@@ -33,7 +33,6 @@ class AppDataProvider extends ChangeNotifier {
   bool get hasError => _lastStatus == LoadResultStatus.failure;
   String? get errorMessage => _errorMessage;
   bool get isStorageSelected => _isStorageSelected;
-  set isStorageSelected(bool value) => _isStorageSelected = value;
   String? get currentFileName => _currentFileName;
 
   // --- 1. アプリ起動時の入り口 ---
@@ -48,6 +47,18 @@ class AppDataProvider extends ChangeNotifier {
       _isInitialized = true;
       notifyListeners();
     }
+  }
+
+  // --- 2a. 保存済みファイルの有無確認 ---
+  Future<bool> hasStoredFile() => repository.hasStoredFile();
+
+  // --- 2b. 保存済みファイルの復元 ---
+  Future<bool> restoreFileAndInitialize() async {
+    final success = await repository.restoreFile();
+    if (!success) return false;
+    _isStorageSelected = true;
+    await initialize();
+    return true;
   }
 
   // --- 2. ファイルの新規選択（設定画面 or 初回起動時） ---

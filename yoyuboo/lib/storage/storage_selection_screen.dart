@@ -33,10 +33,7 @@ class StorageSelectionScreen extends StatelessWidget {
               ),
               if (kIsWeb)
                 FutureBuilder<bool>(
-                  future: context
-                      .read<AppDataProvider>()
-                      .repository
-                      .hasStoredFile(),
+                  future: context.read<AppDataProvider>().hasStoredFile(),
                   builder: (context, snapshot) {
                     if (snapshot.data != true) return const SizedBox.shrink();
                     return Column(
@@ -68,10 +65,6 @@ class StorageSelectionScreen extends StatelessWidget {
   }
 
   Future<void> _restoreFile(BuildContext context) async {
-    final provider = context.read<AppDataProvider>();
-    final success = await provider.repository.restoreFile();
-    if (!success || !context.mounted) return;
-    provider.isStorageSelected = true;
-    await provider.initialize();
+    await context.read<AppDataProvider>().restoreFileAndInitialize();
   }
 }
