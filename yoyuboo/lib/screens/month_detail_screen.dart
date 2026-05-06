@@ -305,6 +305,7 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
       ),
     );
     if (confirmed != true) return;
+    if (!mounted) return;
 
     final provider = context.read<AppDataProvider>();
     await provider.deleteMonth(widget.yearMonth);
