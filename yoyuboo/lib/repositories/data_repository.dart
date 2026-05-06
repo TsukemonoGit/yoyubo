@@ -70,6 +70,16 @@ class DataRepository {
     }
   }
 
+  // 前回開いたファイルを開く
+  Future<bool> restoreFile() async {
+    if (kIsWeb) {
+      final result = await callRestoreFile();
+      return result == 'success';
+    }
+    // Webのみ対応（Androidは未対応）
+    return false;
+  }
+
   // 前回のファイルURIが保存されているか確認する
   Future<bool> hasStoredFile() async {
     if (kIsWeb) {

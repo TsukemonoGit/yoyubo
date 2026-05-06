@@ -100,13 +100,17 @@
       // File System Access API: 既存ファイルを開く（読み書き可能）
       async function openFile() {
         try {
-          const handle = await window.showSaveFilePicker({
+          const [handle] = await window.showOpenFilePicker({
             types: [{
               description: "JSON File",
               accept: { "application/json": [".json"] },
             }],
-            suggestedName: "data.json",
+            multiple: false,
           });
+          const granted = await handle.requestPermission({ mode: "readwrite" });
+          if (granted !== "granted") {
+            return "error: 読み書き権限が必要です";
+          }
           await saveHandle("mainFile", handle);
           return "success";
         } catch (e) {
@@ -187,6 +191,27 @@
           }
           return fileHandle.name;
         } catch (e) {
+          return "error: " + e.message;
+        }
+      }
+
+      // 前回開いたファイルを開く
+      async function restoreFile() {
+        try {
+          const fileHandle = await getHandle("mainFile");
+          if (!fileHandle) {
+            return "error: 前回開いたファイルがありません";
+          }
+          const granted = await fileHandle.requestPermission({ mode: "readwrite" });
+          if (granted !== "granted") {
+            return "error: 読み書き権限が必要です";
+          }
+          await saveHandle("mainFile", fileHandle);
+          return "success";
+        } catch (e) {
+          if (e.name === "AbortError") {
+            return "cancel";
+          }
           return "error: " + e.message;
         }
       }

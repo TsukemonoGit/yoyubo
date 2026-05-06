@@ -27,8 +27,6 @@ class AppDataProvider extends ChangeNotifier {
   String? _errorMessage;
   LoadResultStatus? _lastStatus;
   String? _currentFileName;
-  String? _currentFilePath;
-
   // --- ゲッター ---
   AppData? get data => _data;
   bool get isInitialized => _isInitialized;
@@ -36,7 +34,6 @@ class AppDataProvider extends ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get isStorageSelected => _isStorageSelected;
   String? get currentFileName => _currentFileName;
-  String? get currentFilePath => _currentFilePath;
 
   // --- 1. アプリ起動時の入り口 ---
   Future<void> loadSettingsAndInitialize() async {
@@ -50,6 +47,18 @@ class AppDataProvider extends ChangeNotifier {
       _isInitialized = true;
       notifyListeners();
     }
+  }
+
+  // --- 2a. 保存済みファイルの有無確認 ---
+  Future<bool> hasStoredFile() => repository.hasStoredFile();
+
+  // --- 2b. 保存済みファイルの復元 ---
+  Future<bool> restoreFileAndInitialize() async {
+    final success = await repository.restoreFile();
+    if (!success) return false;
+    _isStorageSelected = true;
+    await initialize();
+    return true;
   }
 
   // --- 2. ファイルの新規選択（設定画面 or 初回起動時） ---
@@ -68,27 +77,49 @@ class AppDataProvider extends ChangeNotifier {
   Future<void> initialize() async {
     developer.log('initialize: starting', name: 'DataProvider');
     final result = await repository.loadData();
-    developer.log('initialize: loadData status=${result.status}, dataKeys=${result.data?.records.keys.toList()}', name: 'DataProvider');
+    developer.log(
+      'initialize: loadData status=${result.status}, dataKeys=${result.data?.records.keys.toList()}',
+      name: 'DataProvider',
+    );
     _lastStatus = result.status;
 
     if (result.status == LoadResultStatus.firstTime) {
-      _data = AppData(
-        startYearMonth: AppDateUtils.getCurrentYearMonth(),
-        records: {},
-      );
-      developer.log('initialize: created new data', name: 'DataProvider');
-      await repository.saveData(_data!);
+      final hasStored = await repository.hasStoredFile();
+      if (!hasStored) {
+        _data = AppData(
+          startYearMonth: AppDateUtils.getCurrentYearMonth(),
+          records: {},
+        );
+        developer.log('initialize: created new data', name: 'DataProvider');
+        await repository.saveData(_data!);
+      } else {
+        _lastStatus = LoadResultStatus.failure;
+        _errorMessage = 'ファイルの読み込みに失敗しました。「前回開いたファイルを開く」から再度開いてください。';
+        developer.log(
+          'initialize: stored file exists but load failed — treating as permission error',
+          name: 'DataProvider',
+        );
+      }
     } else if (result.status == LoadResultStatus.success) {
       _data = result.data;
-      developer.log('initialize: loaded existing data, records=${_data!.records.keys.toList()}', name: 'DataProvider');
+      developer.log(
+        'initialize: loaded existing data, records=${_data!.records.keys.toList()}',
+        name: 'DataProvider',
+      );
     } else {
       _errorMessage = result.errorMessage;
-      developer.log('initialize: load failed, error=$_errorMessage', name: 'DataProvider');
+      developer.log(
+        'initialize: load failed, error=$_errorMessage',
+        name: 'DataProvider',
+      );
     }
 
     // ファイル名を取得
     _currentFileName = await repository.getFileName();
-    developer.log('initialize: fileName=$_currentFileName', name: 'DataProvider');
+    developer.log(
+      'initialize: fileName=$_currentFileName',
+      name: 'DataProvider',
+    );
 
     _isInitialized = true;
     notifyListeners();
@@ -125,7 +156,10 @@ class AppDataProvider extends ChangeNotifier {
     _data?.records[yearMonth]?.events.add(
       Event(memo: memo, amountHint: amountHint, label: label),
     );
-    developer.log('addEvent: $yearMonth memo=$memo label=$label', name: 'DataProvider');
+    developer.log(
+      'addEvent: $yearMonth memo=$memo label=$label',
+      name: 'DataProvider',
+    );
     await _saveAndNotify();
   }
 
@@ -147,7 +181,12 @@ class AppDataProvider extends ChangeNotifier {
       return;
     }
 
-    events[index] = Event(id: eventId, memo: memo, amountHint: amountHint, label: label);
+    events[index] = Event(
+      id: eventId,
+      memo: memo,
+      amountHint: amountHint,
+      label: label,
+    );
     await _saveAndNotify();
   }
 
@@ -156,6 +195,17 @@ class AppDataProvider extends ChangeNotifier {
     _data?.records[yearMonth]?.events.removeWhere(
       (event) => event.id == eventId,
     );
+    await _saveAndNotify();
+  }
+
+  Future<void> addMonth(String yearMonth) async {
+    if (_data == null) return;
+    _ensureMonthRecord(yearMonth);
+    final currentStart = AppDateUtils.parseYearMonth(_data!.startYearMonth);
+    final selected = AppDateUtils.parseYearMonth(yearMonth);
+    if (selected.isBefore(currentStart)) {
+      _data!.startYearMonth = yearMonth;
+    }
     await _saveAndNotify();
   }
 
@@ -179,17 +229,30 @@ class AppDataProvider extends ChangeNotifier {
       return;
     }
 
-    developer.log('_saveAndNotify: records=${_data!.records.keys.toList()}, startYearMonth=${_data!.startYearMonth}', name: 'DataProvider');
+    developer.log(
+      '_saveAndNotify: records=${_data!.records.keys.toList()}, startYearMonth=${_data!.startYearMonth}',
+      name: 'DataProvider',
+    );
 
     try {
-      final jsonStr = const JsonEncoder.withIndent('  ').convert(_data!.toJson());
-      developer.log('_saveAndNotify: JSON length=${jsonStr.length}', name: 'DataProvider');
+      final jsonStr = const JsonEncoder.withIndent(
+        '  ',
+      ).convert(_data!.toJson());
+      developer.log(
+        '_saveAndNotify: JSON length=${jsonStr.length}',
+        name: 'DataProvider',
+      );
       await repository.saveData(_data!);
       developer.log('_saveAndNotify: saveData success', name: 'DataProvider');
       _errorMessage = null;
       notifyListeners();
     } catch (e, stack) {
-      developer.log('_saveAndNotify: saveData failed: $e', name: 'DataProvider', error: e, stackTrace: stack);
+      developer.log(
+        '_saveAndNotify: saveData failed: $e',
+        name: 'DataProvider',
+        error: e,
+        stackTrace: stack,
+      );
       _errorMessage = 'データの保存に失敗しました: ${e.toString()}';
       notifyListeners();
     }

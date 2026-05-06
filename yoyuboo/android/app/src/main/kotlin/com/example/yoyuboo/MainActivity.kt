@@ -122,7 +122,10 @@ class MainActivity : FlutterActivity() {
             return
         }
         try {
-            android.util.Log.d("MainActivity", "writeFile: uri=$uri, contentLength=${content.length}")
+            android.util.Log.d(
+                    "MainActivity",
+                    "writeFile: uri=$uri, contentLength=${content.length}"
+            )
             contentResolver.openFileDescriptor(uri, "wt")?.use { pfd ->
                 java.io.FileOutputStream(pfd.fileDescriptor).use { fos ->
                     fos.write(content.toByteArray())

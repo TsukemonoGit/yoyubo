@@ -18,6 +18,9 @@ external JSPromise<JSString> _openFile();
 @JS('createFile')
 external JSPromise<JSString> _createFile();
 
+@JS('restoreFile')
+external JSPromise<JSString> _restoreFile();
+
 Future<String> callLoadMainFile() async {
   final JSString result = await _loadMainFile().toDart;
   return result.toDart;
@@ -45,5 +48,10 @@ Future<String> callOpenFile() async {
 
 Future<String> callCreateFile() async {
   final JSString result = await _createFile().toDart;
+  return result.toDart;
+}
+
+Future<String> callRestoreFile() async {
+  final JSString result = await _restoreFile().toDart;
   return result.toDart;
 }

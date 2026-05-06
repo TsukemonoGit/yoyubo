@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -30,7 +31,24 @@ class StorageSelectionScreen extends StatelessWidget {
                 onPressed: () => _pickFile(context, create: false),
                 child: const Text('既存ファイルを開く'),
               ),
-              const SizedBox(height: 8),
+              if (kIsWeb)
+                FutureBuilder<bool>(
+                  future: context.read<AppDataProvider>().hasStoredFile(),
+                  builder: (context, snapshot) {
+                    if (snapshot.data != true) return const SizedBox.shrink();
+                    return Column(
+                      children: [
+                        const SizedBox(height: 8),
+                        OutlinedButton(
+                          onPressed: () => _restoreFile(context),
+                          child: const Text('前回開いたファイルを開く'),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              if (!kIsWeb) const SizedBox(height: 8),
+              if (kIsWeb) const SizedBox(height: 8),
               OutlinedButton(
                 onPressed: () => _pickFile(context, create: true),
                 child: const Text('新規ファイルを作成'),
@@ -42,9 +60,11 @@ class StorageSelectionScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _pickFile(
-      BuildContext context, {required bool create}) async {
-    await context.read<AppDataProvider>().pickFileAndInitialize(
-        create: create);
+  Future<void> _pickFile(BuildContext context, {required bool create}) async {
+    await context.read<AppDataProvider>().pickFileAndInitialize(create: create);
+  }
+
+  Future<void> _restoreFile(BuildContext context) async {
+    await context.read<AppDataProvider>().restoreFileAndInitialize();
   }
 }

@@ -42,15 +42,14 @@ Future<void> showHomeMenu(BuildContext context, AppData data) async {
       await _showDataInputOutputMenu(context);
     case HomeMenuAction.graph:
       await Navigator.of(context).push(
-        MaterialPageRoute<void>(
-            builder: (_) => BalanceGraphPage(data: data)),
+        MaterialPageRoute<void>(builder: (_) => BalanceGraphPage(data: data)),
       );
     case HomeMenuAction.theme:
       _showNotImplemented(context, 'テーマ');
     case HomeMenuAction.help:
-      await Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => const HelpPage()),
-      );
+      await Navigator.of(
+        context,
+      ).push(MaterialPageRoute<void>(builder: (_) => const HelpPage()));
   }
 }
 
@@ -67,29 +66,34 @@ class _HomeMenuList extends StatelessWidget {
       shrinkWrap: true,
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 46),
       children: [
-        if (provider.currentFileName != null)
-          ...[_buildFileInfoSection(context, provider),
-              const Divider(height: 1)],
+        if (provider.currentFileName != null) ...[
+          _buildFileInfoSection(context, provider),
+          const Divider(height: 1),
+        ],
         _buildAddSection(context),
         const Divider(height: 1),
+        _homeMenuItem(context, Icons.bar_chart, 'グラフで見る', HomeMenuAction.graph),
         _homeMenuItem(
-            context, Icons.bar_chart, 'グラフで見る', HomeMenuAction.graph),
-        _homeMenuItem(context, Icons.folder_open, 'ファイル操作',
-            HomeMenuAction.openOrCreateFile),
+          context,
+          Icons.folder_open,
+          'ファイル操作',
+          HomeMenuAction.openOrCreateFile,
+        ),
         _homeMenuItem(
-            context, Icons.upload, 'データの入出力', HomeMenuAction.dataInputOutput),
-        _homeMenuItem(
-            context, Icons.color_lens, 'テーマ', HomeMenuAction.theme),
+          context,
+          Icons.upload,
+          'データの入出力',
+          HomeMenuAction.dataInputOutput,
+        ),
+        _homeMenuItem(context, Icons.color_lens, 'テーマ', HomeMenuAction.theme),
         _homeMenuItem(context, Icons.help, '使い方', HomeMenuAction.help),
       ],
     );
   }
 
-  Widget _buildFileInfoSection(
-      BuildContext context, AppDataProvider provider) {
+  Widget _buildFileInfoSection(BuildContext context, AppDataProvider provider) {
     return Padding(
-      padding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -105,9 +109,7 @@ class _HomeMenuList extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerHighest,
+              color: Theme.of(context).colorScheme.surfaceContainerHighest,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Column(
@@ -115,8 +117,7 @@ class _HomeMenuList extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.description,
-                        size: 16, color: Colors.grey[600]),
+                    Icon(Icons.description, size: 16, color: Colors.grey[600]),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
@@ -124,33 +125,14 @@ class _HomeMenuList extends StatelessWidget {
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                   ],
                 ),
-                if (provider.currentFilePath != null) ...[
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(Icons.folder,
-                          size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          provider.currentFilePath!,
-                          style: const TextStyle(
-                              fontSize: 11, color: Colors.grey),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                // ファイル名のみ表示
               ],
             ),
           ),
@@ -161,15 +143,16 @@ class _HomeMenuList extends StatelessWidget {
 
   Widget _buildAddSection(BuildContext context) {
     return InkWell(
-      onTap: () =>
-          Navigator.of(context).pop(HomeMenuAction.addMonth),
+      onTap: () => Navigator.of(context).pop(HomeMenuAction.addMonth),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 16, vertical: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
-            Icon(Icons.add_circle,
-                size: 32, color: Theme.of(context).colorScheme.primary),
+            Icon(
+              Icons.add_circle,
+              size: 32,
+              color: Theme.of(context).colorScheme.primary,
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
@@ -185,9 +168,9 @@ class _HomeMenuList extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                      'メモ・残高・月を追加',
-                      style:
-                          TextStyle(fontSize: 13, color: Colors.grey[600])),
+                    'メモ・残高・月を追加',
+                    style: TextStyle(fontSize: 13, color: Colors.grey[600]),
+                  ),
                 ],
               ),
             ),
@@ -261,7 +244,9 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
                 child: DropdownButtonFormField<int>(
                   initialValue: _year,
                   decoration: const InputDecoration(
-                      labelText: '年', border: OutlineInputBorder()),
+                    labelText: '年',
+                    border: OutlineInputBorder(),
+                  ),
                   items: List.generate(
                     widget.maxYear - 2000 + 1,
                     (i) => DropdownMenuItem<int>(
@@ -286,13 +271,16 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
                 child: DropdownButtonFormField<int>(
                   initialValue: _month,
                   decoration: const InputDecoration(
-                      labelText: '月', border: OutlineInputBorder()),
+                    labelText: '月',
+                    border: OutlineInputBorder(),
+                  ),
                   items: List.generate(
-                      _maxMonthForYear,
-                      (i) => DropdownMenuItem<int>(
-                            value: i + 1,
-                            child: Text('${i + 1}月'),
-                          )),
+                    _maxMonthForYear,
+                    (i) => DropdownMenuItem<int>(
+                      value: i + 1,
+                      child: Text('${i + 1}月'),
+                    ),
+                  ),
                   onChanged: (value) {
                     if (value != null) {
                       setState(() => _month = value);
@@ -306,24 +294,17 @@ class _MonthPickerDialogState extends State<_MonthPickerDialog> {
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('キャンセル')),
+          onPressed: () => Navigator.of(context).pop(),
+          child: const Text('キャンセル'),
+        ),
         FilledButton(
           onPressed: () {
             final yearMonth = AppDateUtils.formatYearMonth(
-                DateTime(_year, _month));
+              DateTime(_year, _month),
+            );
             final provider = context.read<AppDataProvider>();
-            final data = provider.data;
-            if (data != null) {
-              final currentStart =
-                  AppDateUtils.parseYearMonth(data.startYearMonth);
-              final selected = AppDateUtils.parseYearMonth(yearMonth);
-              if (selected.isBefore(currentStart)) {
-                data.startYearMonth = yearMonth;
-              }
-              provider.updateStartYearMonth(yearMonth);
-              data.records.putIfAbsent(
-                  yearMonth, () => MonthRecord(events: []));
+            if (provider.data != null) {
+              provider.addMonth(yearMonth);
             }
             Navigator.of(context).pop();
           },
@@ -363,24 +344,22 @@ Future<void> _showOpenOrCreateDialog(BuildContext context) async {
           ListTile(
             leading: const Icon(Icons.folder_open),
             title: const Text('ファイルを開く'),
-            subtitle:
-                const Text('既存のファイルを選択して読み込み'),
-            onTap: () =>
-                Navigator.of(dialogContext).pop(_FileAction.open),
+            subtitle: const Text('既存のファイルを選択して読み込み'),
+            onTap: () => Navigator.of(dialogContext).pop(_FileAction.open),
           ),
           ListTile(
             leading: const Icon(Icons.create_new_folder),
             title: const Text('新規作成'),
             subtitle: const Text('新しいファイルを作成'),
-            onTap: () =>
-                Navigator.of(dialogContext).pop(_FileAction.create),
+            onTap: () => Navigator.of(dialogContext).pop(_FileAction.create),
           ),
         ],
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('キャンセル')),
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          child: const Text('キャンセル'),
+        ),
       ],
     ),
   );
@@ -406,33 +385,31 @@ Future<void> _showDataInputOutputMenu(BuildContext context) async {
           ListTile(
             leading: const Icon(Icons.upload),
             title: const Text('エクスポート'),
-            subtitle:
-                const Text('データを外部ファイルに書き出し'),
-            onTap: () => Navigator.of(dialogContext)
-                .pop(_DataInputOutputAction.export),
+            subtitle: const Text('データを外部ファイルに書き出し'),
+            onTap: () =>
+                Navigator.of(dialogContext).pop(_DataInputOutputAction.export),
           ),
           ListTile(
             leading: const Icon(Icons.download),
             title: const Text('インポート'),
-            subtitle:
-                const Text('外部ファイルからデータを読み込み'),
-            onTap: () => Navigator.of(dialogContext)
-                .pop(_DataInputOutputAction.import),
+            subtitle: const Text('外部ファイルからデータを読み込み'),
+            onTap: () =>
+                Navigator.of(dialogContext).pop(_DataInputOutputAction.import),
           ),
           ListTile(
             leading: const Icon(Icons.restore),
             title: const Text('バックアップから復元'),
-            subtitle:
-                const Text('内部バックアップから復元'),
-            onTap: () => Navigator.of(dialogContext)
-                .pop(_DataInputOutputAction.restore),
+            subtitle: const Text('内部バックアップから復元'),
+            onTap: () =>
+                Navigator.of(dialogContext).pop(_DataInputOutputAction.restore),
           ),
         ],
       ),
       actions: [
         TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: const Text('キャンセル')),
+          onPressed: () => Navigator.of(dialogContext).pop(),
+          child: const Text('キャンセル'),
+        ),
       ],
     ),
   );
@@ -453,36 +430,29 @@ Future<void> _importData(BuildContext context) async {
   final success = await provider.importData();
   if (!context.mounted) return;
   ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(
-        content: Text(success
-            ? 'データをインポートしました。'
-            : 'インポートに失敗しました。')),
+    SnackBar(content: Text(success ? 'データをインポートしました。' : 'インポートに失敗しました。')),
   );
 }
 
 Future<void> _restoreBackup(BuildContext context) async {
   final provider = context.read<AppDataProvider>();
-  final restored =
-      await provider.restoreFromInternalBackup();
+  final restored = await provider.restoreFromInternalBackup();
   if (!context.mounted) return;
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text(restored
-          ? 'バックアップから復元しました。'
-          : '復元できるバックアップがありません。'),
+      content: Text(restored ? 'バックアップから復元しました。' : '復元できるバックアップがありません。'),
     ),
   );
 }
 
 Future<void> _exportData(BuildContext context) async {
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(
-        content: Text('エクスポート機能は現在準備中です。')),
-  );
+  ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(const SnackBar(content: Text('エクスポート機能は現在準備中です。')));
 }
 
 void _showNotImplemented(BuildContext context, String label) {
-  ScaffoldMessenger.of(context).showSnackBar(
-    SnackBar(content: Text('$label はこれから実装します。')),
-  );
+  ScaffoldMessenger.of(
+    context,
+  ).showSnackBar(SnackBar(content: Text('$label はこれから実装します。')));
 }
