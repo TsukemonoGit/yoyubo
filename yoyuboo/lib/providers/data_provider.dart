@@ -35,6 +35,7 @@ class AppDataProvider extends ChangeNotifier {
   bool get hasError => _lastStatus == LoadResultStatus.failure;
   String? get errorMessage => _errorMessage;
   bool get isStorageSelected => _isStorageSelected;
+  set isStorageSelected(bool value) => _isStorageSelected = value;
   String? get currentFileName => _currentFileName;
   String? get currentFilePath => _currentFilePath;
 

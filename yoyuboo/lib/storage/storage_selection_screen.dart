@@ -71,6 +71,7 @@ class StorageSelectionScreen extends StatelessWidget {
     final provider = context.read<AppDataProvider>();
     final success = await provider.repository.restoreFile();
     if (!success || !context.mounted) return;
+    provider.isStorageSelected = true;
     await provider.initialize();
   }
 }
