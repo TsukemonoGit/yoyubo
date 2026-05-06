@@ -2,6 +2,10 @@
 
 家計の「普通じゃない月」を記録するアプリ。
 
+|                            |                            |
+| -------------------------- | -------------------------- |
+| ![img](/docs/capture1.png) | ![img](/docs/capture2.png) |
+
 ## デザイン思想
 
 - 正確さよりも傾向の把握を重視
@@ -15,12 +19,12 @@
 
 ## サポートプラットフォーム
 
-| プラットフォーム | ストレージ | 状態 |
-|-----------------|-----------|------|
-| Android | Storage Access Framework (SAF) | 対応 |
-| iOS | ファイル選択 | 対応予定 |
-| Web | File System Access API + IndexedDB | 対応 |
-| Desktop | - | 対応予定 |
+| プラットフォーム | ストレージ                         | 状態     |
+| ---------------- | ---------------------------------- | -------- |
+| Android          | Storage Access Framework (SAF)     | 対応     |
+| iOS              | ファイル選択                       | 対応予定 |
+| Web              | File System Access API + IndexedDB | 対応     |
+| Desktop          | -                                  | 対応予定 |
 
 ## データの取り扱い
 

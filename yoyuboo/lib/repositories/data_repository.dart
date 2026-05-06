@@ -102,7 +102,7 @@ class DataRepository {
   Future<LoadResult> loadData() async {
     if (kIsWeb) {
       final result = await callLoadMainFile();
-      if (result.startsWith('error:')) {
+      if (result.startsWith('error:') || result.trim().isEmpty) {
         return LoadResult(status: LoadResultStatus.firstTime);
       }
       try {

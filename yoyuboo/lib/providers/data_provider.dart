@@ -68,6 +68,16 @@ class AppDataProvider extends ChangeNotifier {
         : await repository.openFile();
     if (!picked) return false;
 
+    if (create) {
+      // 新規作成の場合、空のファイルに初期データを書き込んでおく
+      // （空ファイルのまま initialize() を呼ぶと読み込み失敗扱いになるため）
+      final initialData = AppData(
+        startYearMonth: AppDateUtils.getCurrentYearMonth(),
+        records: {},
+      );
+      await repository.saveData(initialData);
+    }
+
     _isStorageSelected = true;
     await initialize();
     return true;
