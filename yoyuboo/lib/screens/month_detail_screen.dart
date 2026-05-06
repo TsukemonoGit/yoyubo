@@ -45,8 +45,14 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-            AppDateUtils.formatYearMonthLabel(widget.yearMonth)),
+        title: Text(AppDateUtils.formatYearMonthLabel(widget.yearMonth)),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            tooltip: 'この月を削除',
+            onPressed: _deleteMonth,
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(16),
@@ -56,8 +62,7 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
               const Expanded(
                 child: Text(
                   'その月にあったこと',
-                  style: TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w700),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
                 ),
               ),
               FilledButton.tonalIcon(
@@ -76,70 +81,69 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
               ),
             )
           else
-            ...events.map(
-              (event) {
-                final labelStyle = event.label != null
-                    ? TextStyle(
-                        fontSize: 11,
-                        color: event.label!.color,
-                        fontWeight: FontWeight.w600,
-                      )
-                    : null;
-                return Card(
-                  margin: const EdgeInsets.only(bottom: 12),
-                  child: ListTile(
-                    title: Text(event.memo),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (labelStyle != null)
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 4),
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: event.label!.color.withValues(alpha: 0.15),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                event.label!.displayName,
-                                style: labelStyle,
-                              ),
+            ...events.map((event) {
+              final labelStyle = event.label != null
+                  ? TextStyle(
+                      fontSize: 11,
+                      color: event.label!.color,
+                      fontWeight: FontWeight.w600,
+                    )
+                  : null;
+              return Card(
+                margin: const EdgeInsets.only(bottom: 12),
+                child: ListTile(
+                  title: Text(event.memo),
+                  subtitle: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      if (labelStyle != null)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 4),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 2,
+                            ),
+                            decoration: BoxDecoration(
+                              color: event.label!.color.withValues(alpha: 0.15),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              event.label!.displayName,
+                              style: labelStyle,
                             ),
                           ),
-                        event.amountHint == null
-                            ? const Text('金額メモなし')
-                            : Text(
-                                '金額メモ: ${formatAmountWithUnit(event.amountHint)}'),
-                      ],
-                    ),
-                    trailing: PopupMenuButton<_EventAction>(
-                      onSelected: (action) {
-                        switch (action) {
-                          case _EventAction.edit:
-                            _editEvent(event);
-                          case _EventAction.delete:
-                            _deleteEvent(event);
-                        }
-                      },
-                      itemBuilder: (context) => const [
-                        PopupMenuItem(
-                          value: _EventAction.edit,
-                          child: Text('編集'),
                         ),
-                        PopupMenuItem(
-                          value: _EventAction.delete,
-                          child: Text('削除'),
-                        ),
-                      ],
-                    ),
+                      event.amountHint == null
+                          ? const Text('金額メモなし')
+                          : Text(
+                              '金額メモ: ${formatAmountWithUnit(event.amountHint)}',
+                            ),
+                    ],
                   ),
-                );
-              },
-            ),
+                  trailing: PopupMenuButton<_EventAction>(
+                    onSelected: (action) {
+                      switch (action) {
+                        case _EventAction.edit:
+                          _editEvent(event);
+                        case _EventAction.delete:
+                          _deleteEvent(event);
+                      }
+                    },
+                    itemBuilder: (context) => const [
+                      PopupMenuItem(
+                        value: _EventAction.edit,
+                        child: Text('編集'),
+                      ),
+                      PopupMenuItem(
+                        value: _EventAction.delete,
+                        child: Text('削除'),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }),
           const SizedBox(height: 16),
           Card(
             child: Padding(
@@ -149,8 +153,7 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
                 children: [
                   const Text(
                     '月末残高',
-                    style: TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w700),
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -160,8 +163,7 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
                   const SizedBox(height: 12),
                   TextField(
                     controller: _balanceController,
-                    keyboardType:
-                        const TextInputType.numberWithOptions(
+                    keyboardType: const TextInputType.numberWithOptions(
                       decimal: true,
                       signed: true,
                     ),
@@ -201,18 +203,17 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
       return;
     }
 
-    await context
-        .read<AppDataProvider>()
-        .updateBalance(widget.yearMonth, parsed);
+    await context.read<AppDataProvider>().updateBalance(
+      widget.yearMonth,
+      parsed,
+    );
     if (!mounted) return;
     _showSnackBar('月末残高を保存しました。');
   }
 
   Future<void> _clearBalance() async {
     _balanceController.clear();
-    await context
-        .read<AppDataProvider>()
-        .updateBalance(widget.yearMonth, null);
+    await context.read<AppDataProvider>().updateBalance(widget.yearMonth, null);
     if (!mounted) return;
     _showSnackBar('月末残高を空欄にしました。');
   }
@@ -226,7 +227,11 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
     if (result == null) return;
 
     await provider.addEvent(
-        widget.yearMonth, result.memo, result.amountHint, result.label);
+      widget.yearMonth,
+      result.memo,
+      result.amountHint,
+      result.label,
+    );
     if (!mounted) return;
     _showSnackBar('メモを追加しました。');
   }
@@ -235,8 +240,7 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
     final provider = context.read<AppDataProvider>();
     final result = await showDialog<EventDraft>(
       context: context,
-      builder: (context) =>
-          EventDialog(initialEvent: event),
+      builder: (context) => EventDialog(initialEvent: event),
     );
     if (result == null) return;
 
@@ -272,18 +276,49 @@ class _MonthDetailPageState extends State<MonthDetailPage> {
     );
     if (confirmed != true) return;
 
-    await provider
-        .deleteEvent(widget.yearMonth, event.id);
+    await provider.deleteEvent(widget.yearMonth, event.id);
     if (!mounted) return;
     _showSnackBar('メモを削除しました。');
   }
 
+  Future<void> _deleteMonth() async {
+    final label = AppDateUtils.formatYearMonthLabel(widget.yearMonth);
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('この月を削除'),
+        content: Text('$label のデータ（メモ・残高）をすべて削除しますか？\nこの操作は元に戻せません。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('キャンセル'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+              foregroundColor: Theme.of(context).colorScheme.onError,
+            ),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('削除'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true) return;
+    if (!mounted) return;
+
+    final provider = context.read<AppDataProvider>();
+    await provider.deleteMonth(widget.yearMonth);
+    if (!mounted) return;
+    Navigator.of(context).pop();
+  }
+
   void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 }
 
 /// イベントアクション列挙
 enum _EventAction { edit, delete }
-

@@ -217,6 +217,22 @@ class AppDataProvider extends ChangeNotifier {
     await _saveAndNotify();
   }
 
+  Future<void> deleteMonth(String yearMonth) async {
+    if (_data == null) return;
+    _data!.records.remove(yearMonth);
+
+    // startYearMonth が削除対象だった場合、残りの最古月 or 現在月に更新
+    if (_data!.startYearMonth == yearMonth) {
+      final remaining = _data!.records.keys.toList()..sort();
+      _data!.startYearMonth = remaining.isNotEmpty
+          ? remaining.first
+          : AppDateUtils.getCurrentYearMonth();
+    }
+
+    developer.log('deleteMonth: $yearMonth', name: 'DataProvider');
+    await _saveAndNotify();
+  }
+
   // 内部処理
   void _ensureMonthRecord(String yearMonth) {
     _data?.records.putIfAbsent(yearMonth, () => MonthRecord(events: []));
