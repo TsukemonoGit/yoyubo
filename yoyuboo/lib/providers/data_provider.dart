@@ -72,12 +72,19 @@ class AppDataProvider extends ChangeNotifier {
     _lastStatus = result.status;
 
     if (result.status == LoadResultStatus.firstTime) {
-      _data = AppData(
-        startYearMonth: AppDateUtils.getCurrentYearMonth(),
-        records: {},
-      );
-      developer.log('initialize: created new data', name: 'DataProvider');
-      await repository.saveData(_data!);
+      final hasStored = await repository.hasStoredFile();
+      if (!hasStored) {
+        _data = AppData(
+          startYearMonth: AppDateUtils.getCurrentYearMonth(),
+          records: {},
+        );
+        developer.log('initialize: created new data', name: 'DataProvider');
+        await repository.saveData(_data!);
+      } else {
+        _lastStatus = LoadResultStatus.failure;
+        _errorMessage = 'ファイルの読み込みに失敗しました。「前回開いたファイルを開く」から再度開いてください。';
+        developer.log('initialize: stored file exists but load failed — treating as permission error', name: 'DataProvider');
+      }
     } else if (result.status == LoadResultStatus.success) {
       _data = result.data;
       developer.log('initialize: loaded existing data, records=${_data!.records.keys.toList()}', name: 'DataProvider');
