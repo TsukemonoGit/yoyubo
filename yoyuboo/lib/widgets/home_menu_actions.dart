@@ -133,24 +133,7 @@ class _HomeMenuList extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (provider.currentFilePath != null) ...[
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      Icon(Icons.folder,
-                          size: 14, color: Colors.grey[600]),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          provider.currentFilePath!,
-                          style: const TextStyle(
-                              fontSize: 11, color: Colors.grey),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                // ファイル名のみ表示
               ],
             ),
           ),

@@ -221,26 +221,6 @@ class DataRepository {
     return null;
   }
 
-  // ファイルパス（URI）を取得する
-  Future<String?> getFilePath() async {
-    if (kIsWeb) {
-      final result = await callGetFileHandleName();
-      if (result.startsWith('error:')) {
-        return null;
-      }
-      return result;
-    }
-    if (!_canUseNativeFileChannel) return null;
-    try {
-      final result = await _channel.invokeMethod<String>('getFilePath');
-      return result;
-    } on PlatformException {
-      return null;
-    } on MissingPluginException {
-      return null;
-    }
-  }
-
   // 内部バックアップから読み込む（設定画面の「バックアップから復元」）
   Future<LoadResult> loadDataFromBackup() async {
     if (kIsWeb) {

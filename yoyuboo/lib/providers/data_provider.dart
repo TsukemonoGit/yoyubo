@@ -27,9 +27,7 @@ class AppDataProvider extends ChangeNotifier {
   String? _errorMessage;
   LoadResultStatus? _lastStatus;
   String? _currentFileName;
-  String? _currentFilePath;
-
-  // --- ゲッター ---
+ // --- ゲッター ---
   AppData? get data => _data;
   bool get isInitialized => _isInitialized;
   bool get hasError => _lastStatus == LoadResultStatus.failure;
@@ -37,7 +35,6 @@ class AppDataProvider extends ChangeNotifier {
   bool get isStorageSelected => _isStorageSelected;
   set isStorageSelected(bool value) => _isStorageSelected = value;
   String? get currentFileName => _currentFileName;
-  String? get currentFilePath => _currentFilePath;
 
   // --- 1. アプリ起動時の入り口 ---
   Future<void> loadSettingsAndInitialize() async {
@@ -94,10 +91,9 @@ class AppDataProvider extends ChangeNotifier {
       developer.log('initialize: load failed, error=$_errorMessage', name: 'DataProvider');
     }
 
-    // ファイル名とパスを取得
+    // ファイル名を取得
     _currentFileName = await repository.getFileName();
-    _currentFilePath = await repository.getFilePath();
-    developer.log('initialize: fileName=$_currentFileName, filePath=$_currentFilePath', name: 'DataProvider');
+    developer.log('initialize: fileName=$_currentFileName', name: 'DataProvider');
 
     _isInitialized = true;
     notifyListeners();
@@ -220,7 +216,6 @@ class AppDataProvider extends ChangeNotifier {
         _lastStatus = LoadResultStatus.success;
         _errorMessage = null;
         _currentFileName = await repository.getFileName();
-        _currentFilePath = await repository.getFilePath();
         notifyListeners();
         return true;
       } else {
