@@ -10,7 +10,8 @@ jobs:
   build-android:
     name: Build & Release Android APK
     runs-on: ubuntu-latest
-
+    permissions:
+      contents: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
