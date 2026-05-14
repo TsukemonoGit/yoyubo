@@ -1,0 +1,47 @@
+name: Android Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build-android:
+    name: Build & Release Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set up Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          cache: true
+
+      - name: Flutter pub get
+        working-directory: yoyuboo
+        run: flutter pub get
+
+      - name: Build APK (release)
+        working-directory: yoyuboo
+        run: flutter build apk --release
+
+      - name: Rename APK
+        run: |
+          mv yoyuboo/build/app/outputs/flutter-apk/app-release.apk \
+             yoyuboo/build/app/outputs/flutter-apk/yoyuboo-${{ github.ref_name }}.apk
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true
+          files: yoyuboo/build/app/outputs/flutter-apk/yoyuboo-${{ github.ref_name }}.apk

@@ -121,6 +121,18 @@ class MainActivity : FlutterActivity() {
             result.error("NO_URI", "No file URI stored", null)
             return
         }
+        // 書き込み前にJSONバリデーション（破損データの書き込みを防ぐ）
+        val trimmed = content.trim()
+        try {
+            when {
+                trimmed.startsWith("{") -> org.json.JSONObject(trimmed)
+                trimmed.startsWith("[") -> org.json.JSONArray(trimmed)
+                else -> throw org.json.JSONException("Not a JSON object or array")
+            }
+        } catch (e: org.json.JSONException) {
+            result.error("INVALID_JSON", "Content is not valid JSON: ${e.message}", null)
+            return
+        }
         try {
             android.util.Log.d(
                     "MainActivity",
